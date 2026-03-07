@@ -1,0 +1,39 @@
+//
+//  ToastView.swift
+//  DesignSystem
+//
+//  Created by Hafshy Yazid Albisthami on 07/03/26.
+//
+
+import SwiftUI
+import Core
+
+public struct ToastView: View {
+    @EnvironmentObject var theme: NewsTheme
+    public let message: String
+    
+    public init(message: String) {
+        self.message = message
+    }
+    
+    public var body: some View {
+        HStack(spacing: 10) {
+            Image(systemName: "exclamationmark.circle.fill")
+                .foregroundColor(theme.core.colors.semantic.errorFG)
+
+            Text(message)
+                .font(.system(size: 13, weight: .medium))
+                .foregroundColor(theme.textPrimary)
+                .lineLimit(2)
+
+            Spacer()
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
+        .background(theme.cardSurface)
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .shadow(color: theme.cardShadow, radius: 12, x: 0, y: 4)
+        .padding(.horizontal, 16)
+        .padding(.top, 8)
+    }
+}

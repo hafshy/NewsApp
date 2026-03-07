@@ -1,0 +1,92 @@
+[
+  {
+    "category": "World",
+    "headline": "Global Leaders Convene for Emergency Climate Summit in Geneva",
+    "summary": "Representatives from 140 nations gathered to address accelerating sea-level projections and outline binding carbon commitments for 2030.",
+    "author": "Elena Vasquez",
+    "timestamp": "2h ago",
+    "readTime": 4,
+    "isBreaking": true
+  },
+  {
+    "category": "Technology",
+    "headline": "New Semiconductor Architecture Promises Tenfold Energy Efficiency",
+    "summary": "A breakthrough in 3D chip stacking developed at MIT could reshape data center economics and extend mobile battery life dramatically.",
+    "author": "James Okafor",
+    "timestamp": "4h ago",
+    "readTime": 6,
+    "isBreaking": false
+  },
+  {
+    "category": "Finance",
+    "headline": "Central Banks Signal Coordinated Rate Pause Amid Mixed Signals",
+    "summary": "The Fed, ECB, and Bank of England indicated readiness to hold rates steady as inflation cools but labor markets remain surprisingly tight.",
+    "author": "Priya Nair",
+    "timestamp": "6h ago",
+    "readTime": 5,
+    "isBreaking": false
+  },
+  {
+    "category": "Arts",
+    "headline": "Rediscovered Caravaggio Painting Authenticated After Decades in Private Collection",
+    "summary": "A long-rumored lost canvas from 1601 has been verified through multispectral imaging, setting the art world abuzz ahead of its auction.",
+    "author": "Marco Bellini",
+    "timestamp": "9h ago",
+    "readTime": 3,
+    "isBreaking": false
+  },
+  {
+    "category": "Science",
+    "headline": "Mars Soil Sample Analysis Reveals Complex Organic Compounds",
+    "summary": "Data transmitted from the Perseverance rover points to a richer-than-expected chemical history, fueling debate about ancient habitability.",
+    "author": "Dr. Yuki Tanaka",
+    "timestamp": "12h ago",
+    "readTime": 7,
+    "isBreaking": false
+  },
+  {
+    "category": "Health",
+    "headline": "Large-Scale Trial Shows mRNA Platform Effective Against Aggressive Cancers",
+    "summary": "Phase III results for a personalized tumour vaccine show a 44% reduction in recurrence rates across three cancer types.",
+    "author": "Amara Osei",
+    "timestamp": "1d ago",
+    "readTime": 8,
+    "isBreaking": false
+  },
+  {
+    "category": "World",
+    "headline": "Ceasefire Negotiations Resume as Humanitarian Corridor Opens",
+    "summary": "Diplomats from six nations convened in Brussels as aid agencies began moving supplies through the first agreed corridor in three months.",
+    "author": "Sofia Andersen",
+    "timestamp": "3h ago",
+    "readTime": 5,
+    "isBreaking": true
+  },
+  {
+    "category": "Technology",
+    "headline": "Open-Source AI Model Outperforms Proprietary Rivals on Key Benchmarks",
+    "summary": "A model released without restrictions by a European research consortium has topped several standard reasoning and coding evaluations.",
+    "author": "Kenji Watanabe",
+    "timestamp": "5h ago",
+    "readTime": 4,
+    "isBreaking": false
+  },
+  {
+    "category": "Finance",
+    "headline": "Startup Valuations Rebound as Venture Capital Returns to Early-Stage Deals",
+    "summary": "After eight quarters of contraction, deal volume in seed and Series A rounds rose 22% year-on-year according to new industry data.",
+    "author": "Lena Hoffmann",
+    "timestamp": "8h ago",
+    "readTime": 4,
+    "isBreaking": false
+  },
+  {
+    "category": "Science",
+    "headline": "Deep-Sea Expedition Discovers Thriving Ecosystem Near Hydrothermal Vents",
+    "summary": "Researchers aboard the research vessel Nautilus documented over 30 previously unknown species during a six-week dive in the South Pacific.",
+    "author": "Dr. Amelia Cruz",
+    "timestamp": "1d ago",
+    "readTime": 6,
+    "isBreaking": false
+  }
+]
