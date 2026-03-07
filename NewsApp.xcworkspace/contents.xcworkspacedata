@@ -17,4 +17,11 @@
          location = "group:Core">
       </FileRef>
    </Group>
+   <FileRef
+      location = "group:README.md">
+   </FileRef>
+   <FileSystemSynchronizedGroup
+      location = "group:demo"
+      name = "demo">
+   </FileSystemSynchronizedGroup>
 </Workspace>
