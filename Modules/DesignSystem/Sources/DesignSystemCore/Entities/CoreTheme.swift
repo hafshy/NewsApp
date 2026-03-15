@@ -5,10 +5,22 @@
 //  Created by Hafshy Yazid Albisthami on 26/02/26.
 //
 
-import SwiftUI
+public struct ColorToken: Sendable, Hashable {
+    public let assetName: String
+    public let fallbackHex: String?
+
+    public init(assetName: String, fallbackHex: String? = nil) {
+        self.assetName = assetName
+        self.fallbackHex = fallbackHex
+    }
+}
 
 public struct CoreTheme: Sendable {
     public let colors: CoreColors
+
+    public init(colors: CoreColors) {
+        self.colors = colors
+    }
 }
 
 public extension CoreTheme {
@@ -20,83 +32,97 @@ public struct CoreColors: Sendable {
     public let grey: Grey
     public let background: Background
     public let semantic: Semantic
-    
+
+    public init(
+        primary: Primary,
+        grey: Grey,
+        background: Background,
+        semantic: Semantic
+    ) {
+        self.primary = primary
+        self.grey = grey
+        self.background = background
+        self.semantic = semantic
+    }
+
     public struct Primary: Sendable, Equatable {
-        public let primary100: Color
-        public let primary200: Color
-        public let primary300: Color
-        public let primary400: Color
-        public let primary500: Color
-        public let primary600: Color
-        public let primary700: Color
-        public let primary800: Color
-        public let primary900: Color
+        public let primary100: ColorToken
+        public let primary200: ColorToken
+        public let primary300: ColorToken
+        public let primary400: ColorToken
+        public let primary500: ColorToken
+        public let primary600: ColorToken
+        public let primary700: ColorToken
+        public let primary800: ColorToken
+        public let primary900: ColorToken
     }
+
     public struct Grey: Sendable, Equatable {
-        public let grey100: Color
-        public let grey200: Color
-        public let grey300: Color
-        public let grey400: Color
-        public let grey500: Color
-        public let grey600: Color
-        public let grey700: Color
-        public let grey800: Color
-        public let grey900: Color
+        public let grey100: ColorToken
+        public let grey200: ColorToken
+        public let grey300: ColorToken
+        public let grey400: ColorToken
+        public let grey500: ColorToken
+        public let grey600: ColorToken
+        public let grey700: ColorToken
+        public let grey800: ColorToken
+        public let grey900: ColorToken
     }
+
     public struct Background: Sendable, Equatable {
-        public let primary: Color
-        public let secondary: Color
-        public let tertiary: Color
-        public let elevated: Color
+        public let primary: ColorToken
+        public let secondary: ColorToken
+        public let tertiary: ColorToken
+        public let elevated: ColorToken
     }
+
     public struct Semantic: Sendable, Equatable {
-        public let successBG: Color
-        public let successFG: Color
-        public let warningBG: Color
-        public let warningFG: Color
-        public let errorBG: Color
-        public let errorFG: Color
+        public let successBG: ColorToken
+        public let successFG: ColorToken
+        public let warningBG: ColorToken
+        public let warningFG: ColorToken
+        public let errorBG: ColorToken
+        public let errorFG: ColorToken
     }
 }
 
 public extension CoreColors {
     static let `default` = CoreColors(
         primary: .init(
-            primary100: Color("primary-100-color", bundle: .module),
-            primary200: Color("primary-200-color", bundle: .module),
-            primary300: Color("primary-300-color", bundle: .module),
-            primary400: Color("primary-400-color", bundle: .module),
-            primary500: Color("primary-500-color", bundle: .module),
-            primary600: Color("primary-600-color", bundle: .module),
-            primary700: Color("primary-700-color", bundle: .module),
-            primary800: Color("primary-800-color", bundle: .module),
-            primary900: Color("primary-900-color", bundle: .module)
+            primary100: ColorToken(assetName: "primary-100-color"),
+            primary200: ColorToken(assetName: "primary-200-color"),
+            primary300: ColorToken(assetName: "primary-300-color"),
+            primary400: ColorToken(assetName: "primary-400-color"),
+            primary500: ColorToken(assetName: "primary-500-color"),
+            primary600: ColorToken(assetName: "primary-600-color"),
+            primary700: ColorToken(assetName: "primary-700-color"),
+            primary800: ColorToken(assetName: "primary-800-color"),
+            primary900: ColorToken(assetName: "primary-900-color")
         ),
         grey: .init(
-            grey100: Color("grey-100-color", bundle: .module),
-            grey200: Color("grey-200-color", bundle: .module),
-            grey300: Color("grey-300-color", bundle: .module),
-            grey400: Color("grey-400-color", bundle: .module),
-            grey500: Color("grey-500-color", bundle: .module),
-            grey600: Color("grey-600-color", bundle: .module),
-            grey700: Color("grey-700-color", bundle: .module),
-            grey800: Color("grey-800-color", bundle: .module),
-            grey900: Color("grey-900-color", bundle: .module)
+            grey100: ColorToken(assetName: "grey-100-color"),
+            grey200: ColorToken(assetName: "grey-200-color"),
+            grey300: ColorToken(assetName: "grey-300-color"),
+            grey400: ColorToken(assetName: "grey-400-color"),
+            grey500: ColorToken(assetName: "grey-500-color"),
+            grey600: ColorToken(assetName: "grey-600-color"),
+            grey700: ColorToken(assetName: "grey-700-color"),
+            grey800: ColorToken(assetName: "grey-800-color"),
+            grey900: ColorToken(assetName: "grey-900-color")
         ),
         background: .init(
-            primary: Color("bg-primary-color", bundle: .module),
-            secondary: Color("bg-secondary-color", bundle: .module),
-            tertiary: Color("bg-tertiary-color", bundle: .module),
-            elevated: Color("bg-elevated-color", bundle: .module)
+            primary: ColorToken(assetName: "bg-primary-color"),
+            secondary: ColorToken(assetName: "bg-secondary-color"),
+            tertiary: ColorToken(assetName: "bg-tertiary-color"),
+            elevated: ColorToken(assetName: "bg-elevated-color")
         ),
         semantic: .init(
-            successBG: Color("bg-success-color", bundle: .module),
-            successFG: Color("fg-success-color", bundle: .module),
-            warningBG: Color("bg-warning-color", bundle: .module),
-            warningFG: Color("fg-warning-color", bundle: .module),
-            errorBG: Color("bg-error-color", bundle: .module),
-            errorFG: Color("fg-error-color", bundle: .module)
+            successBG: ColorToken(assetName: "bg-success-color"),
+            successFG: ColorToken(assetName: "fg-success-color"),
+            warningBG: ColorToken(assetName: "bg-warning-color"),
+            warningFG: ColorToken(assetName: "fg-warning-color"),
+            errorBG: ColorToken(assetName: "bg-error-color"),
+            errorFG: ColorToken(assetName: "fg-error-color")
         )
     )
 }
-

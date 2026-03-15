@@ -42,48 +42,55 @@ struct ArticleDetailPage: View {
     // MARK: - Header
 
     private var header: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            // Category + Breaking
-            HStack(spacing: 6) {
-                if article.isBreaking {
-                    Text("BREAKING")
+        VStack(alignment: .leading, spacing: 0) {
+            AppImage.remote(
+                URL(string: article.imageURL ?? ""),
+                placeholderSystemName: "newspaper"
+            )
+            .frame(maxWidth: .infinity)
+            .frame(height: 220)
+            .clipped()
+
+            VStack(alignment: .leading, spacing: 12) {
+                HStack(spacing: 6) {
+                    if article.isBreaking {
+                        Text("BREAKING")
+                            .font(.system(size: 10, weight: .bold, design: .monospaced))
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(theme.breakingBadge)
+                            .clipShape(RoundedRectangle(cornerRadius: 4))
+                    }
+                    Text(article.category.uppercased())
                         .font(.system(size: 10, weight: .bold, design: .monospaced))
-                        .foregroundColor(.white)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .background(theme.core.colors.semantic.errorFG)
-                        .clipShape(RoundedRectangle(cornerRadius: 4))
+                        .tracking(1.4)
+                        .foregroundColor(theme.accent)
                 }
-                Text(article.category.uppercased())
-                    .font(.system(size: 10, weight: .bold, design: .monospaced))
-                    .tracking(1.4)
-                    .foregroundColor(theme.accent)
-            }
 
-            // Headline
-            Text(article.headline)
-                .font(.system(size: 24, weight: .bold, design: .serif))
-                .foregroundColor(theme.textPrimary)
-                .lineSpacing(4)
+                Text(article.headline)
+                    .font(.system(size: 24, weight: .bold, design: .serif))
+                    .foregroundColor(theme.textPrimary)
+                    .lineSpacing(4)
 
-            // Byline
-            HStack(spacing: 6) {
-                Text(article.author)
-                    .font(.system(size: 12, weight: .semibold, design: .monospaced))
-                    .foregroundColor(theme.textSecondary)
-                Text("·")
-                    .foregroundColor(theme.textMuted)
-                Text(article.timestamp)
-                    .font(.system(size: 12, design: .monospaced))
-                    .foregroundColor(theme.textMuted)
-                Text("·")
-                    .foregroundColor(theme.textMuted)
-                Text("\(article.readTime) min read")
-                    .font(.system(size: 12, design: .monospaced))
-                    .foregroundColor(theme.textMuted)
+                HStack(spacing: 6) {
+                    Text(article.author)
+                        .font(.system(size: 12, weight: .semibold, design: .monospaced))
+                        .foregroundColor(theme.textSecondary)
+                    Text("·")
+                        .foregroundColor(theme.textMuted)
+                    Text(article.timestamp)
+                        .font(.system(size: 12, design: .monospaced))
+                        .foregroundColor(theme.textMuted)
+                    Text("·")
+                        .foregroundColor(theme.textMuted)
+                    Text("\(article.readTime) min read")
+                        .font(.system(size: 12, design: .monospaced))
+                        .foregroundColor(theme.textMuted)
+                }
             }
+            .padding(20)
         }
-        .padding(20)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(theme.cardSurface)
     }

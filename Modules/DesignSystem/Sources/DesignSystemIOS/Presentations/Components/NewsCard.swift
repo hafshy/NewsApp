@@ -20,15 +20,17 @@ public struct NewsCard: View {
     public var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             ZStack(alignment: .topLeading) {
-                Rectangle()
-                    .fill(.blue)
-                    .frame(height: 180)
-                    .overlay(
-                        LinearGradient(
-                            colors: [.clear, .black.opacity(0.32)],
-                            startPoint: .top, endPoint: .bottom
-                        )
+                AppImage.remote(
+                    URL(string: article.imageURL ?? ""),
+                    placeholderSystemName: "newspaper"
+                )
+                .frame(height: 180)
+                .overlay(
+                    LinearGradient(
+                        colors: [.clear, .black.opacity(0.32)],
+                        startPoint: .top, endPoint: .bottom
                     )
+                )
 
                 HStack(spacing: 4) {
                     if article.isBreaking {
@@ -97,6 +99,7 @@ public struct NewsCard: View {
     NewsCard(
         article: .init(
             category: "SPORT",
+            imageURL: "https://images.unsplash.com/photo-1547347298-4074fc3086f0?auto=format&fit=crop&w=1200&q=80",
             headline: "Sport title",
             summary: "This is summary of sport news",
             author: "Someone",

@@ -13,7 +13,8 @@ let package = Package(
         .library(name: "DesignSystemIOS", targets: ["DesignSystemIOS"])
     ],
     dependencies: [
-        .package(path: "../Core")
+        .package(path: "../Core"),
+        .package(url: "https://github.com/SDWebImage/SDWebImageSwiftUI.git", exact: "2.2.7")
     ],
     targets: [
         .target(
@@ -22,7 +23,11 @@ let package = Package(
         ),
         .target(
             name: "DesignSystemIOS",
-            dependencies: ["DesignSystemCore", "Core"]
+            dependencies: [
+                "DesignSystemCore",
+                "Core",
+                "SDWebImageSwiftUI"
+            ]
         )
     ]
 )

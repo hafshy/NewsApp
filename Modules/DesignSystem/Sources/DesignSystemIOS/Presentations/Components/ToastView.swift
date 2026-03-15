@@ -18,8 +18,8 @@ public struct ToastView: View {
     
     public var body: some View {
         HStack(spacing: 10) {
-            Image(systemName: "exclamationmark.circle.fill")
-                .foregroundColor(theme.core.colors.semantic.errorFG)
+            AppImage.system("exclamationmark.circle.fill", tint: theme.errorForeground)
+                .frame(width: 18, height: 18)
 
             Text(message)
                 .font(.system(size: 13, weight: .medium))
