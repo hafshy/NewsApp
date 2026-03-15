@@ -5,13 +5,16 @@
 //  Created by Hafshy Yazid Albisthami on 07/03/26.
 //
 
+import Core
 import SwiftUI
 import DesignSystemCore
 
-public final class NewsTheme: ObservableObject {
+@MainActor
+public final class NewsTheme: ObservableObject, AppThemeProtocol {
     
     // The underlying design-token theme. Swap to any CoreTheme variant at runtime.
     @Published public var core: CoreTheme = .default
+    @Published public private(set) var themeMode: AppThemeMode = .system
     /// Main page / list background
     public var pageBackground: Color { core.colors.background.primary }
 
@@ -49,4 +52,8 @@ public final class NewsTheme: ObservableObject {
     public var breakingBadgeFG: Color { .white }
     
     public init() {}
+
+    public func setThemeMode(_ themeMode: AppThemeMode) {
+        self.themeMode = themeMode
+    }
 }

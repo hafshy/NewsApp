@@ -9,19 +9,32 @@
 import Foundation
 import Core
 
-@MainActor
-final class FetchArticlesUseCase {
-    private let repository = NewsRepository()
+public protocol FetchArticlesUseCaseProtocol {
+    @MainActor
+    func execute() async throws -> [NewsArticle]
+}
 
+final class FetchArticlesUseCase: FetchArticlesUseCaseProtocol {
+    private let repository: any NewsRepositoryProtocol
+
+    init(repository: any NewsRepositoryProtocol) {
+        self.repository = repository
+    }
+
+    @MainActor
     func execute() async throws -> [NewsArticle] {
         try await repository.fetchArticles()
     }
 }
 
-@MainActor
 final class FetchArticleUseCase {
-    private let repository = NewsRepository()
+    private let repository: any NewsRepositoryProtocol
 
+    init(repository: any NewsRepositoryProtocol) {
+        self.repository = repository
+    }
+
+    @MainActor
     func execute(id: String) async throws -> NewsArticle? {
         try await repository.fetchArticle(id: id)
     }

@@ -13,10 +13,16 @@ import Combine
 
 @main
 struct NewsApp: App {
+    @StateObject private var container: AppContainer
+
+    @MainActor
+    init() {
+        _container = StateObject(wrappedValue: AppContainer())
+    }
     
     var body: some Scene {
         WindowGroup {
-            RootView()
+            RootView(container: container)
         }
     }
 }

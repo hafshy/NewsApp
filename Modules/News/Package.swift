@@ -16,13 +16,15 @@ let package = Package(
     ],
     dependencies: [
         .package(path: "../Core"),
-        .package(path: "../DesignSystem")
+        .package(path: "../DesignSystem"),
+        .package(url: "https://github.com/Swinject/Swinject.git", from: "2.9.1")
     ],
     targets: [
         .target(
             name: "News",
             dependencies: [
                 "Core",
+                "Swinject",
                 .product(name: "DesignSystemCore", package: "DesignSystem"),
                 .product(name: "DesignSystemIOS", package: "DesignSystem")
             ],

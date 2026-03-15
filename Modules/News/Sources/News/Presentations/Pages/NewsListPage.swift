@@ -10,16 +10,23 @@ import DesignSystemIOS
 import DesignSystemCore
 import Core
 
-public struct NewsListPage: View {
+struct NewsListPage: View {
     @EnvironmentObject var theme: NewsTheme
-    @StateObject var viewModel = NewsListViewModel()
-    var coordinator: NewsCoordinator
+    @StateObject private var viewModel: NewsListViewModel
+    private let themeManager: any ThemeManagerProtocol
+    private let onSelectArticle: (NewsArticle) -> Void
     
-    public init(coordinator: NewsCoordinator) {
-        self.coordinator = coordinator
+    init(
+        viewModel: NewsListViewModel,
+        themeManager: any ThemeManagerProtocol,
+        onSelectArticle: @escaping (NewsArticle) -> Void
+    ) {
+        _viewModel = StateObject(wrappedValue: viewModel)
+        self.themeManager = themeManager
+        self.onSelectArticle = onSelectArticle
     }
     
-    public var body: some View {
+    var body: some View {
         ZStack {
             theme.pageBackground.ignoresSafeArea()
             
@@ -34,15 +41,20 @@ public struct NewsListPage: View {
                         Text("No Articles")
                     } else {
                         ForEach(viewModel.articles) { news in
-                            NewsCard(article: news)
-                                .padding(.horizontal, 12)
-                                .onTapGesture {
-                                    if news.isError {
-                                        viewModel.showError("Failed to load article")
-                                    } else {
-                                        coordinator.push(.detail(article: news))
-                                    }
+                            Group {
+                                if news.isError {
+                                    NewsCard(article: news)
+                                        .onTapGesture {
+                                            viewModel.showError("Failed to load article")
+                                        }
+                                } else {
+                                    NewsCard(article: news)
+                                        .onTapGesture {
+                                            onSelectArticle(news)
+                                        }
                                 }
+                            }
+                            .padding(.horizontal, 12)
                         }
                     }
                 }
@@ -62,9 +74,30 @@ public struct NewsListPage: View {
         .animation(.spring(response: 0.4, dampingFraction: 0.8), value: viewModel.errorMessage)
         .navigationTitle("News App")
         .navigationBarTitleDisplayMode(.large)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                themeMenu
+            }
+        }
         .onAppear {
             Task {
                 await viewModel.load()
+            }
+        }
+    }
+
+    private var themeMenu: some View {
+        Menu("Theme") {
+            Button("System") {
+                themeManager.useSystemTheme()
+            }
+
+            Button("Light") {
+                themeManager.useLightTheme()
+            }
+
+            Button("Dark") {
+                themeManager.useDarkTheme()
             }
         }
     }

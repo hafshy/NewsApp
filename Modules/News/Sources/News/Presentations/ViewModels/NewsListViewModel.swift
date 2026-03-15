@@ -9,14 +9,18 @@ import Foundation
 import Core
 
 @MainActor
-final class NewsListViewModel: ObservableObject {
+public final class NewsListViewModel: ObservableObject {
     
     @Published var articles: [NewsArticle] = []
     @Published var isLoading = false
     @Published var errorMessage: String? = nil
     
-    private let fetchArticles = FetchArticlesUseCase()
+    private let fetchArticles: any FetchArticlesUseCaseProtocol
     private var dismissTask: Task<Void, Never>?
+
+    public init(fetchArticles: any FetchArticlesUseCaseProtocol) {
+        self.fetchArticles = fetchArticles
+    }
     
     func load() async {
         guard articles.isEmpty else { return }

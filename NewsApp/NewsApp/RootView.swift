@@ -6,35 +6,29 @@
 //
 
 import Core
-import DesignSystemCore
 import DesignSystemIOS
 import SwiftUI
-import News
 
 struct RootView: View {
-    @StateObject private var navigator = AppNavigator()
-    @StateObject private var theme = NewsTheme()
+    @StateObject private var container: AppContainer
+    @ObservedObject private var navigator: AppNavigator
+    @ObservedObject private var theme: NewsTheme
 
-    private var newsCoord: NewsCoordinator
-
-    init() {
-        let nav = AppNavigator()
-        _navigator = StateObject(wrappedValue: nav)
-        _theme = StateObject(wrappedValue: NewsTheme())
-        newsCoord = NewsCoordinator(appNavigator: nav)
+    init(container: AppContainer) {
+        _container = StateObject(wrappedValue: container)
+        _navigator = ObservedObject(wrappedValue: container.navigator)
+        _theme = ObservedObject(wrappedValue: container.theme)
     }
 
     var body: some View {
         NavigationStack(path: $navigator.path) {
-            NewsListPage(coordinator: newsCoord)
-                .navigationDestination(for: NewsRoute.self) { route in
-                    AppRouter.destination(
-                        for: route,
-                        newsCoord: newsCoord
-                    )
-                    .environmentObject(theme)
+            container.makeRootView()
+                .navigationDestination(for: AppRoute.self) { route in
+                    container.destination(for: route)
+                        .environmentObject(theme)
                 }
         }
         .environmentObject(theme)
+        .preferredColorScheme(theme.themeMode.colorScheme)
     }
 }

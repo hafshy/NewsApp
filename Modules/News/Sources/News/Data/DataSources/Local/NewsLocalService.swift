@@ -8,9 +8,14 @@
 import Foundation
 import Core
 
-@MainActor
-final class NewsLocalService {
+protocol NewsLocalServiceProtocol {
+    @MainActor
+    func fetchArticles() async throws -> [NewsArticle]
+}
 
+final class NewsLocalService: NewsLocalServiceProtocol {
+
+    @MainActor
     func fetchArticles() async throws -> [NewsArticle] {
         try await Task.sleep(nanoseconds: 4_000_000_000)
         return try load()

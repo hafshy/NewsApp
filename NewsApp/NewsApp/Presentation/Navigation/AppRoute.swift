@@ -1,19 +1,19 @@
 //
 //  AppRoute.swift
-//  Core
+//  NewsApp
 //
-//  Created by Hafshy Yazid Albisthami on 07/03/26.
+//  Created by Hafshy Yazid Albisthami on 15/03/26.
 //
 
 import News
-import Core
 
-public enum AppRoute: Routable {
+enum AppRoute: Hashable, Identifiable {
     case news(NewsRoute)
 
-    public var id: String {
+    var id: String {
         switch self {
-        case .news(let r): return "news-\(r.id)"
+        case .news(let route):
+            "news-\(route.id)"
         }
     }
 }

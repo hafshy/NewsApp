@@ -10,17 +10,17 @@ import DesignSystemIOS
 import DesignSystemCore
 import Core
 
-public struct ArticleDetailPage: View {
+struct ArticleDetailPage: View {
     @EnvironmentObject var theme: NewsTheme
     let article: NewsArticle
-    var coordinator: NewsCoordinator
+    private let themeManager: any ThemeManagerProtocol
 
-    public init(article: NewsArticle, coordinator: NewsCoordinator) {
+    init(article: NewsArticle, themeManager: any ThemeManagerProtocol) {
         self.article = article
-        self.coordinator = coordinator
+        self.themeManager = themeManager
     }
 
-    public var body: some View {
+    var body: some View {
         ZStack {
             theme.pageBackground.ignoresSafeArea()
 
@@ -32,6 +32,11 @@ public struct ArticleDetailPage: View {
             }
         }
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                themeMenu
+            }
+        }
     }
 
     // MARK: - Header
@@ -111,5 +116,21 @@ public struct ArticleDetailPage: View {
                 .lineSpacing(7)
         }
         .padding(20)
+    }
+
+    private var themeMenu: some View {
+        Menu("Theme") {
+            Button("System") {
+                themeManager.useSystemTheme()
+            }
+
+            Button("Light") {
+                themeManager.useLightTheme()
+            }
+
+            Button("Dark") {
+                themeManager.useDarkTheme()
+            }
+        }
     }
 }

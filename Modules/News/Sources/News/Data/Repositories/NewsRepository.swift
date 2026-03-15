@@ -8,16 +8,26 @@
 import Foundation
 import Core
 
-@MainActor
-public final class NewsRepository {
+protocol NewsRepositoryProtocol {
+    @MainActor
+    func fetchArticles() async throws -> [NewsArticle]
+    @MainActor
+    func fetchArticle(id: String) async throws -> NewsArticle?
+}
 
-    private let service = NewsLocalService()
+final class NewsRepository: NewsRepositoryProtocol {
+    private let service: any NewsLocalServiceProtocol
 
-    func fetchArticles() async throws -> [NewsArticle] {
-        let articles = try await service.fetchArticles()
-        return articles
+    init(service: any NewsLocalServiceProtocol) {
+        self.service = service
     }
 
+    @MainActor
+    func fetchArticles() async throws -> [NewsArticle] {
+        try await service.fetchArticles()
+    }
+
+    @MainActor
     func fetchArticle(id: String) async throws -> NewsArticle? {
         let articles = try await service.fetchArticles()
         return articles.first { $0.id.uuidString == id.lowercased() }
