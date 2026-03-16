@@ -1,6 +1,7 @@
 # NewsApp
 
 ![News App Demo](demo/NewsAppDemo.gif)
+![News App Demo 2](demo/NewsAppDemo2.gif)
 
 A modular SwiftUI news reader application implemented using **MVVM architecture** and **Swift Package Manager (SPM) modularization**.
 
