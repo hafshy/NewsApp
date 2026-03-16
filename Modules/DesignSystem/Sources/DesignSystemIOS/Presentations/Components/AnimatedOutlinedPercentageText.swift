@@ -20,6 +20,7 @@ public struct AnimatedOutlinedPercentageText: View {
 
     @State private var displayedValue: Int
     @State private var animationTask: Task<Void, Never>?
+    @State private var hasStartedAnimation = false
 
     public init(
         value: Int,
@@ -29,7 +30,7 @@ public struct AnimatedOutlinedPercentageText: View {
         fillColor: Color,
         strokeColor: Color,
         lineWidth: CGFloat = 2,
-        stepDuration: Double = 0.04,
+        stepDuration: Double = 0.001,
         startValue: Int = 1
     ) {
         self.targetValue = value
@@ -55,13 +56,8 @@ public struct AnimatedOutlinedPercentageText: View {
             lineWidth: lineWidth
         )
         .onAppear {
-            startAnimation()
-        }
-        .onDisappear {
-            animationTask?.cancel()
-            animationTask = nil
-        }
-        .onChange(of: targetValue) { _, _ in
+            guard !hasStartedAnimation else { return }
+            hasStartedAnimation = true
             startAnimation()
         }
     }

@@ -9,6 +9,16 @@ import SwiftUI
 import Core
 
 public struct NewsCard: View {
+    private enum Layout {
+        static let contentHeight: CGFloat = 130
+        static let thumbnailWidth: CGFloat = 150
+        static let thumbnailHeight: CGFloat = 130
+        static let verificationIconHeight: CGFloat = 37
+        static let sentimentIconSize: CGFloat = 18
+        static let infoIconSize: CGFloat = 12
+        static let actionIconSize: CGFloat = 18
+    }
+
     public let article: NewsArticle
     @EnvironmentObject var theme: NewsTheme
     @State private var isPressed = false
@@ -18,74 +28,164 @@ public struct NewsCard: View {
     }
 
     public var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            ZStack(alignment: .topLeading) {
-                AppImage.remote(
-                    URL(string: article.imageURL ?? ""),
-                    placeholderSystemName: "newspaper"
-                )
-                .frame(height: 180)
-                .overlay(
-                    LinearGradient(
-                        colors: [.clear, .black.opacity(0.32)],
-                        startPoint: .top, endPoint: .bottom
-                    )
-                )
+        LazyVStack(alignment: .leading, spacing: 0) {
+            contentSection
+                .frame(height: Layout.contentHeight)
+            .padding(8)
 
-                HStack(spacing: 4) {
-                    Circle()
-                        .fill(theme.breakingBadgeFG)
-                        .frame(width: 6, height: 6)
-                    Text("BREAKING · \(article.feed.uppercased())")
-                        .appFont(.labelXS, family: .systemMonospaced)
-                        .tracking(1.4)
-                        .foregroundColor(theme.breakingBadgeFG)
-                }
-                .padding(.horizontal, 10)
+            Divider()
+
+            footerSection
+                .padding(.horizontal, 8)
                 .padding(.vertical, 6)
-                .background(theme.breakingBadge)
-                .clipShape(RoundedRectangle(cornerRadius: 4))
-                .padding(14)
-            }
-            .clipped()
-
-            VStack(alignment: .leading, spacing: 10) {
-                Text(article.title)
-                    .appFont(.titleMD)
-                    .foregroundColor(theme.textPrimary)
-                    .lineSpacing(3)
-                    .fixedSize(horizontal: false, vertical: true)
-
-                Rectangle()
-                    .fill(theme.accent)
-                    .frame(width: 28, height: 2)
-
-                Text("Trust \(Int((article.trusted * 100).rounded()))% • Mood \(article.happiness > 0 ? "+\(article.happiness)" : "\(article.happiness)")")
-                    .appFont(.bodyLG)
-                    .foregroundColor(theme.textSecondary)
-                    .lineSpacing(4)
-                    .lineLimit(3)
-                    .fixedSize(horizontal: false, vertical: true)
-
-                HStack {
-                    Text(article.feed)
-                        .appFont(.metaXS, weight: .semibold, family: .systemMonospaced)
-                        .foregroundColor(theme.textPrimary)
-                    Spacer()
-                    Text(article.pubDate)
-                        .appFont(.metaXS, family: .systemMonospaced)
-                        .foregroundColor(theme.textMuted)
-                }
-            }
-            .padding(16)
-            .background(theme.cardSurface)
         }
+        .background(Color(token: theme.core.colors.grey.grey100))
         .clipShape(RoundedRectangle(cornerRadius: 10))
         .shadow(color: theme.cardShadow, radius: 12, x: 0, y: 4)
         .shadow(color: theme.cardShadow.opacity(0.5), radius: 2, x: 0, y: 1)
         .scaleEffect(isPressed ? 0.98 : 1.0)
         .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isPressed)
         .onLongPressGesture(minimumDuration: .infinity, pressing: { isPressed = $0 }, perform: {})
+    }
+
+    private var contentSection: some View {
+        HStack(spacing: 20) {
+            textContentSection
+
+            Spacer()
+
+            articleImage
+        }
+    }
+
+    private var textContentSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            trustScoreSection
+
+            Text(article.title)
+                .appFont(.detailLead, family: .montserrat)
+                .foregroundColor(theme.textPrimary)
+                .fixedSize(horizontal: false, vertical: true)
+                .lineLimit(3)
+
+            Spacer()
+
+            Text(article.feed)
+                .appFont(.labelXS, weight: .regular, family: .montserrat)
+                .foregroundColor(theme.textSecondary)
+                .fixedSize(horizontal: false, vertical: true)
+                .lineLimit(1)
+        }
+    }
+
+    private var trustScoreSection: some View {
+        HStack {
+            AppImage.asset(
+                "ic_verified",
+                contentMode: .fit,
+                tint: trustColor
+            )
+            .frame(height: Layout.verificationIconHeight)
+
+            AnimatedOutlinedPercentageText(
+                value: article.trusted.percentageInt,
+                style: .titleMD,
+                fillColor: Color(token: theme.core.colors.grey.grey100),
+                strokeColor: trustColor,
+                stepDuration: 0.001
+            )
+            .offset(x: -20)
+        }
+    }
+
+    private var articleImage: some View {
+        AppImage.remote(
+            URL(string: article.imageURL ?? ""),
+            placeholderSystemName: "newspaper"
+        )
+        .frame(width: Layout.thumbnailWidth, height: Layout.thumbnailHeight)
+        .cornerRadius(8)
+        .clipped()
+    }
+
+    private var footerSection: some View {
+        HStack {
+            sentimentSection
+
+            Spacer()
+
+            actionSection
+        }
+    }
+
+    private var sentimentSection: some View {
+        HStack(alignment: .center, spacing: 6) {
+            AppImage.asset(
+                sentimentIconName,
+                tint: sentimentColor
+            )
+            .frame(width: Layout.sentimentIconSize, height: Layout.sentimentIconSize)
+
+            Text("Sentiment")
+                .appFont(.metaXS, weight: .semibold, family: .montserrat)
+                .foregroundColor(theme.textPrimary)
+                .fixedSize(horizontal: false, vertical: true)
+                .lineLimit(1)
+
+            AppImage.asset("ic_question")
+                .frame(width: Layout.infoIconSize, height: Layout.infoIconSize)
+        }
+    }
+
+    private var actionSection: some View {
+        HStack(spacing: 12) {
+            actionIcon("ic_like")
+            actionIcon("ic_comment")
+
+            AppImage.asset("ic_more", contentMode: .fit)
+                .frame(height: Layout.actionIconSize)
+        }
+    }
+
+    private func actionIcon(_ name: String) -> some View {
+        AppImage.asset(name, contentMode: .fit)
+            .frame(width: Layout.actionIconSize, height: Layout.actionIconSize)
+    }
+
+    private var trustColor: Color {
+        if article.trusted < 0.35 {
+            return Color(token: theme.core.colors.semantic.errorFG)
+        }
+
+        if article.trusted < 0.65 {
+            return Color(token: theme.core.colors.semantic.warningFG)
+        }
+
+        return Color(token: theme.core.colors.semantic.successFG)
+    }
+
+    private var sentimentIconName: String {
+        if article.happiness < 0 {
+            return "ic_sent_negative"
+        }
+
+        if article.happiness == 0 {
+            return "ic_sent_neutral"
+        }
+
+        return "ic_sent_positive"
+    }
+
+    private var sentimentColor: Color {
+        if article.happiness < 0 {
+            return Color(token: theme.core.colors.semantic.errorFG)
+        }
+
+        if article.happiness == 0 {
+            return Color(token: theme.core.colors.semantic.warningFG)
+        }
+
+        return Color(token: theme.core.colors.semantic.successFG)
     }
 }
 
@@ -102,4 +202,6 @@ public struct NewsCard: View {
             trusted: 0.86
         )
     )
+    .padding()
+    .environmentObject(NewsTheme())
 }
