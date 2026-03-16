@@ -11,7 +11,9 @@ import DesignSystemCore
 import Core
 
 struct ArticleDetailPage: View {
+    @Environment(\.dismiss) private var dismiss
     @EnvironmentObject var theme: NewsTheme
+    @State private var isLoadingWebContent = true
     let article: NewsArticle
     private let themeManager: any ThemeManagerProtocol
 
@@ -21,121 +23,205 @@ struct ArticleDetailPage: View {
     }
 
     var body: some View {
-        ZStack {
-            theme.pageBackground.ignoresSafeArea()
-
-            ScrollView {
-                VStack(alignment: .leading, spacing: 0) {
-                    header
-                    content
-                }
-            }
+        VStack(spacing: 0) {
+            header
+            statsStrip
+            articleWebView
+            footerBar
         }
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                themeMenu
-            }
-        }
+        .background(theme.pageBackground.ignoresSafeArea())
+        .toolbar(.hidden, for: .navigationBar)
     }
 
     private var header: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            AppImage.remote(
-                URL(string: article.imageURL ?? ""),
-                placeholderSystemName: "newspaper"
+        VStack(spacing: 8) {
+            HStack {
+                Button {
+                    dismiss()
+                } label: {
+                    AppImage.system("chevron.left", tint: .white)
+                        .frame(width: 20, height: 20)
+                }
+                .buttonStyle(.plain)
+
+                Spacer()
+
+                VStack(spacing: 0) {
+                    Text("Oigetit")
+                        .appFont(.titleMD, weight: .semibold, family: .montserrat)
+                        .foregroundStyle(.white)
+
+                    Text("Your Daily Fact-checked News")
+                        .appFont(.labelXS, weight: .medium, family: .montserrat)
+                        .foregroundStyle(Color.white.opacity(0.92))
+                }
+
+                Spacer()
+
+                Menu {
+                    Button("System") {
+                        themeManager.useSystemTheme()
+                    }
+
+                    Button("Light") {
+                        themeManager.useLightTheme()
+                    }
+
+                    Button("Dark") {
+                        themeManager.useDarkTheme()
+                    }
+                } label: {
+                    AppImage.system("ellipsis.circle", tint: .white)
+                        .frame(width: 20, height: 20)
+                        .opacity(0.001)
+                }
+            }
+            .padding(.horizontal, 16)
+            .padding(.bottom, 10)
+        }
+        .background(Color(hex: "#32B7EF"))
+    }
+    
+    private var trustScoreSection: some View {
+        HStack(spacing: 0) {
+            AppImage.asset(
+                "ic_verified",
+                contentMode: .fit,
+                tint: trustColor
             )
-            .frame(maxWidth: .infinity)
-            .frame(height: 220)
-            .clipped()
+            .frame(height: 37)
 
-            VStack(alignment: .leading, spacing: 12) {
-                HStack(spacing: 6) {
-                    Text("BREAKING")
-                        .appFont(.labelXS, weight: .bold, family: .systemMonospaced)
-                        .foregroundColor(.white)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .background(theme.breakingBadge)
-                        .clipShape(RoundedRectangle(cornerRadius: 4))
-
-                    Text(article.feed.uppercased())
-                        .appFont(.labelXS, weight: .bold, family: .systemMonospaced)
-                        .tracking(1.4)
-                        .foregroundColor(theme.accent)
-                }
-
-                Text(article.title)
-                    .appFont(.detailTitle)
+            AnimatedOutlinedPercentageText(
+                value: article.trusted.percentageInt,
+                style: .titleMD,
+                fillColor: Color(token: theme.core.colors.grey.grey100),
+                strokeColor: trustColor,
+                stepDuration: 0.001
+            )
+            .offset(x: -8)
+            
+            VStack(alignment: .leading, spacing: 0) {
+                Text("Reliability")
+                    .appFont(.metaXS, weight: .medium, family: .montserrat)
                     .foregroundColor(theme.textPrimary)
-                    .lineSpacing(4)
-
-                HStack(spacing: 6) {
-                    Text(article.feed)
-                        .appFont(.bodySM, weight: .semibold, family: .systemMonospaced)
-                        .foregroundColor(theme.textSecondary)
-                    Text("·")
-                        .foregroundColor(theme.textMuted)
-                    Text(article.pubDate)
-                        .appFont(.bodySM, family: .systemMonospaced)
-                        .foregroundColor(theme.textMuted)
-                    Text("·")
-                        .foregroundColor(theme.textMuted)
-                    Text("Trust \(Int((article.trusted * 100).rounded()))%")
-                        .appFont(.bodySM, family: .systemMonospaced)
-                        .foregroundColor(theme.textMuted)
-                }
+                    .lineLimit(1)
+                
+                Text("Score")
+                    .appFont(.metaXS, weight: .medium, family: .montserrat)
+                    .foregroundColor(theme.textPrimary)
+                    .lineLimit(1)
             }
-            .padding(20)
+            .offset(x: -4)
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(theme.cardSurface)
     }
 
-    private var content: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Divider()
-                .background(theme.divider)
+    private var statsStrip: some View {
+        HStack {
+            trustScoreSection
 
-            Text("Source: \(article.feed)")
-                .appFont(.detailLead)
-                .foregroundColor(theme.textPrimary)
-                .lineSpacing(6)
+            Spacer()
 
-            Divider()
-                .background(theme.divider)
+            HStack(spacing: 8) {
+                AppImage.asset(sentimentIconName, tint: sentimentColor)
+                    .frame(width: 20, height: 20)
 
-            Text("Published: \(article.pubDate)")
-                .appFont(.bodyMD)
-                .foregroundColor(theme.textSecondary)
-                .lineSpacing(7)
+                Text("Sentiment")
+                    .appFont(.bodyMD, weight: .semibold, family: .montserrat)
+                    .foregroundStyle(theme.textPrimary)
 
-            Text("Mood: \(article.happiness > 0 ? "+\(article.happiness)" : "\(article.happiness)")")
-                .appFont(.bodyMD)
-                .foregroundColor(theme.textSecondary)
-                .lineSpacing(7)
-
-            Text(article.url)
-                .appFont(.bodyMD)
-                .foregroundColor(theme.accent)
-                .lineSpacing(7)
+                AppImage.asset("ic_question")
+                    .frame(width: 12, height: 12)
+            }
         }
-        .padding(20)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 10)
+        .background(Color.white)
+        .overlay(alignment: .bottom) {
+            Rectangle()
+                .fill(theme.divider)
+                .frame(height: 1)
+        }
     }
 
-    private var themeMenu: some View {
-        Menu("Theme") {
-            Button("System") {
-                themeManager.useSystemTheme()
-            }
+    private var articleWebView: some View {
+        ZStack {
+            AppWebView(
+                url: URL(string: article.url),
+                isLoading: $isLoadingWebContent
+            )
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(Color.white)
 
-            Button("Light") {
-                themeManager.useLightTheme()
-            }
-
-            Button("Dark") {
-                themeManager.useDarkTheme()
+            if isLoadingWebContent {
+                ProgressView()
+                    .progressViewStyle(.circular)
+                    .tint(Color(hex: "#32B7EF"))
             }
         }
+    }
+
+    private var footerBar: some View {
+        HStack {
+            footerButton(systemName: "hand.thumbsup")
+            Spacer()
+            footerButton(systemName: "bubble.left")
+            Spacer()
+            footerButton(systemName: "square.and.arrow.up")
+            Spacer()
+            footerButton(systemName: "bookmark")
+        }
+        .padding(.horizontal, 34)
+        .padding(.vertical, 14)
+        .background(Color.white)
+        .overlay(alignment: .top) {
+            Rectangle()
+                .fill(theme.divider)
+                .frame(height: 1)
+        }
+    }
+
+    private func footerButton(systemName: String) -> some View {
+        Button {
+        } label: {
+            AppImage.system(systemName, tint: Color(hex: "#4AA7E7"))
+                .frame(width: 28, height: 28)
+        }
+        .buttonStyle(.plain)
+    }
+
+    private var trustColor: Color {
+        if article.trusted < 0.35 {
+            return Color(token: theme.core.colors.semantic.errorFG)
+        }
+
+        if article.trusted < 0.65 {
+            return Color(token: theme.core.colors.semantic.warningFG)
+        }
+
+        return Color(token: theme.core.colors.semantic.successFG)
+    }
+
+    private var sentimentIconName: String {
+        if article.happiness < 0 {
+            return "ic_sent_negative"
+        }
+
+        if article.happiness == 0 {
+            return "ic_sent_neutral"
+        }
+
+        return "ic_sent_positive"
+    }
+
+    private var sentimentColor: Color {
+        if article.happiness < 0 {
+            return Color(token: theme.core.colors.semantic.errorFG)
+        }
+
+        if article.happiness == 0 {
+            return Color(token: theme.core.colors.semantic.warningFG)
+        }
+
+        return Color(token: theme.core.colors.semantic.successFG)
     }
 }

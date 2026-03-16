@@ -6,11 +6,15 @@
 //
 
 import Core
+import Foundation
 import SwiftUI
 import DesignSystemCore
 
 @MainActor
 public final class NewsTheme: ObservableObject, AppThemeProtocol {
+    private enum Storage {
+        static let themeModeKey = "app_theme_mode"
+    }
     
     // The underlying design-token theme. Swap to any CoreTheme variant at runtime.
     @Published public var core: CoreTheme = .default
@@ -51,10 +55,24 @@ public final class NewsTheme: ObservableObject, AppThemeProtocol {
     /// Breaking-news badge foreground (text / dot)
     public var breakingBadgeFG: Color { .white }
     public var errorForeground: Color { Color(token: core.colors.semantic.errorFG) }
+    private let userDefaults: UserDefaults
     
-    public init() {}
+    public init(userDefaults: UserDefaults = .standard) {
+        self.userDefaults = userDefaults
+        self.themeMode = Self.loadThemeMode(from: userDefaults)
+    }
 
     public func setThemeMode(_ themeMode: AppThemeMode) {
         self.themeMode = themeMode
+        userDefaults.set(themeMode.rawValue, forKey: Storage.themeModeKey)
+    }
+
+    private static func loadThemeMode(from userDefaults: UserDefaults) -> AppThemeMode {
+        guard let rawValue = userDefaults.string(forKey: Storage.themeModeKey),
+              let themeMode = AppThemeMode(rawValue: rawValue) else {
+            return .system
+        }
+
+        return themeMode
     }
 }

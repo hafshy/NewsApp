@@ -63,23 +63,36 @@ public struct NewsCard: View {
             trustScoreSection
 
             Text(article.title)
-                .appFont(.detailLead, family: .montserrat)
+                .appFont(.bodyMD, family: .montserrat)
                 .foregroundColor(theme.textPrimary)
                 .fixedSize(horizontal: false, vertical: true)
                 .lineLimit(3)
 
-            Spacer()
+            Spacer(minLength: 8)
+            
+            HStack(spacing: 4) {
+                Text(article.feed)
+                    .appFont(.labelXS, weight: .regular, family: .montserrat)
+                    .foregroundColor(theme.textSecondary)
+                    .lineLimit(1)
+                    .truncationMode(.tail)
+                    .layoutPriority(0)
 
-            Text(article.feed)
-                .appFont(.labelXS, weight: .regular, family: .montserrat)
-                .foregroundColor(theme.textSecondary)
-                .fixedSize(horizontal: false, vertical: true)
-                .lineLimit(1)
+                Circle()
+                    .foregroundColor(theme.textSecondary)
+                    .frame(width: 4, height: 4)
+
+                Text(article.relativePublishedDateText)
+                    .appFont(.labelXS, weight: .regular, family: .montserrat)
+                    .foregroundColor(theme.textSecondary)
+                    .fixedSize()
+                    .layoutPriority(1)
+            }
         }
     }
 
     private var trustScoreSection: some View {
-        HStack {
+        HStack(spacing: 0) {
             AppImage.asset(
                 "ic_verified",
                 contentMode: .fit,
@@ -94,7 +107,20 @@ public struct NewsCard: View {
                 strokeColor: trustColor,
                 stepDuration: 0.001
             )
-            .offset(x: -20)
+            .offset(x: -8)
+            
+            VStack(alignment: .leading, spacing: 0) {
+                Text("Reliability")
+                    .appFont(.metaXS, weight: .medium, family: .montserrat)
+                    .foregroundColor(theme.textPrimary)
+                    .lineLimit(1)
+                
+                Text("Score")
+                    .appFont(.metaXS, weight: .medium, family: .montserrat)
+                    .foregroundColor(theme.textPrimary)
+                    .lineLimit(1)
+            }
+            .offset(x: -4)
         }
     }
 
