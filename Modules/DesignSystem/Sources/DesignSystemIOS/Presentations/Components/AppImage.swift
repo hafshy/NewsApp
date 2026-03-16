@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import DesignSystemCore
 import SDWebImageSwiftUI
 import SwiftUI
 
@@ -82,7 +83,7 @@ public struct AppImage: View {
     private var content: some View {
         switch source {
         case .asset(let name):
-            baseImage(Image(name))
+            baseImage(Image(name, bundle: DesignSystemCoreResources.bundle))
         case .system(let name):
             baseImage(Image(systemName: name))
         case .remote(let url):
@@ -107,8 +108,8 @@ public struct AppImage: View {
         ZStack {
             Color.secondary.opacity(0.12)
 
-            Image(systemName: placeholderSystemName)
-                .font(.system(size: 28, weight: .medium))
+            baseImage(Image(systemName: placeholderSystemName))
+                .frame(width: 28, height: 28)
                 .foregroundStyle(tint ?? .secondary)
         }
     }

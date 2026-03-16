@@ -22,7 +22,7 @@ public struct ToastView: View {
                 .frame(width: 18, height: 18)
 
             Text(message)
-                .font(.system(size: 13, weight: .medium))
+                .appFont(.toast)
                 .foregroundColor(theme.textPrimary)
                 .lineLimit(2)
 

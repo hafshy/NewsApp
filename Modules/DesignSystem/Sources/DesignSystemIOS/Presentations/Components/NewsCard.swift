@@ -41,7 +41,7 @@ public struct NewsCard: View {
                     Text(article.isBreaking
                          ? "BREAKING · \(article.category.uppercased())"
                          : article.category.uppercased())
-                        .font(.system(size: 9, weight: .bold, design: .monospaced))
+                        .appFont(.labelXS, family: .systemMonospaced)
                         .tracking(1.4)
                         .foregroundColor(theme.breakingBadgeFG)
                 }
@@ -56,7 +56,7 @@ public struct NewsCard: View {
             VStack(alignment: .leading, spacing: 10) {
 
                 Text(article.headline)
-                    .font(.system(size: 18, weight: .bold, design: .serif))
+                    .appFont(.titleMD)
                     .foregroundColor(theme.textPrimary)
                     .lineSpacing(3)
                     .fixedSize(horizontal: false, vertical: true)
@@ -66,7 +66,7 @@ public struct NewsCard: View {
                     .frame(width: 28, height: 2)
 
                 Text(article.summary)
-                    .font(.system(size: 18))
+                    .appFont(.bodyLG)
                     .foregroundColor(theme.textSecondary)
                     .lineSpacing(4)
                     .lineLimit(3)
@@ -74,11 +74,11 @@ public struct NewsCard: View {
 
                 HStack {
                     Text(article.author)
-                        .font(.system(size: 11, weight: .semibold, design: .monospaced))
+                        .appFont(.metaXS, weight: .semibold, family: .systemMonospaced)
                         .foregroundColor(theme.textPrimary)
                     Spacer()
                     Text("\(article.timestamp) · \(article.readTime) min read")
-                        .font(.system(size: 11, design: .monospaced))
+                        .appFont(.metaXS, family: .systemMonospaced)
                         .foregroundColor(theme.textMuted)
                 }
             }
