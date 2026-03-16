@@ -22,11 +22,10 @@ final class NewsLocalService: NewsLocalServiceProtocol {
     }
 
     private func load() throws -> [NewsArticle] {
-        guard let url = Bundle.module.url(forResource: "news_articles", withExtension: "json") else {
+        guard let url = Bundle.module.url(forResource: "response", withExtension: "json") else {
             throw URLError(.fileDoesNotExist)
         }
         let data = try Data(contentsOf: url)
-//        return try JSONDecoder().decode([NewsArticle].self, from: data)
-        return NewsArticle.samples
+        return try JSONDecoder().decode([NewsArticle].self, from: data)
     }
 }

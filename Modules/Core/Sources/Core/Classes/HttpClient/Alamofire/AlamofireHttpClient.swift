@@ -9,64 +9,50 @@
 import Foundation
 import Alamofire
 
-// Alamofire implementation of `HTTPClientProtocol`
 public final class AlamofireHttpClient: HttpClientProtocol, @unchecked Sendable {
-
     private let session: Session
     private let decoder: JSONDecoder
 
-    public init() {
-        self.session = Session()
-        self.decoder = JSONDecoder()
+    public init(
+        session: Session = Session(),
+        decoder: JSONDecoder = JSONDecoder()
+    ) {
+        self.session = session
+        self.decoder = decoder
     }
 
     public func request<T: Codable>(
         url: String,
         method: HttpMethod,
+        headers: [String: String]?,
         queryParams: [String: Any]?,
         body: [String: Any]?,
         formData: FormData?
     ) async throws -> BaseResponse<T> {
-
-        guard let url = URL(string: url) else {
-            fatalError("Invalid URL: \(url)")
-        }
-
-        let httpMethod = HTTPMethod(rawValue: method.rawValue.uppercased())
-
-        let request: DataRequest
-
-        // MARK: - Create Request
         if let formData {
-            request = session.upload(
-                multipartFormData: { multipart in
-                    multipart.append(
-                        formData.data,
-                        withName: formData.name,
-                        fileName: formData.fileName,
-                        mimeType: formData.mimeType
-                    )
-                },
-                to: url
-            )
-        } else {
-            request = session.request(
-                url,
-                method: httpMethod,
-                parameters: method == .get ? queryParams : body,
-                encoding: method == .get ? URLEncoding.default : JSONEncoding.default
+            return try await uploadMultipart(
+                url: url,
+                method: method,
+                headers: headers,
+                queryParams: queryParams,
+                body: body,
+                formData: formData
             )
         }
 
-        // MARK: - Validate
-        let result = request
-            .validate(contentType: ["application/json"])
+        let urlRequest = try buildURLRequest(
+            url: url,
+            method: method,
+            headers: headers,
+            queryParams: queryParams,
+            body: body
+        )
+        let response = await session
+            .request(urlRequest)
             .validate(statusCode: 200..<300)
+            .serializingData()
+            .response
 
-        // MARK: - Await Response
-        let response = await result.serializingData().response
-
-        // Network or validation error
         if let error = response.error {
             throw error
         }
@@ -75,33 +61,60 @@ public final class AlamofireHttpClient: HttpClientProtocol, @unchecked Sendable 
             throw AFError.responseSerializationFailed(reason: .inputDataNilOrZeroLength)
         }
 
-        // Try BaseResponse<T>
-        if var base = try? decoder.decode(BaseResponse<T>.self, from: data) {
-            base.httpStatusCode = response.response?.statusCode
-            return base
+        return try decodeResponse(data, statusCode: response.response?.statusCode, decoder: decoder)
+    }
+
+    private func uploadMultipart<T: Codable>(
+        url: String,
+        method: HttpMethod,
+        headers: [String: String]?,
+        queryParams: [String: Any]?,
+        body: [String: Any]?,
+        formData: FormData
+    ) async throws -> BaseResponse<T> {
+        let httpMethod = HTTPMethod(rawValue: method.rawValue)
+
+        guard let finalURL = try buildURLRequest(
+            url: url,
+            method: method,
+            headers: headers,
+            queryParams: queryParams,
+            body: nil
+        ).url else {
+            throw HttpClientError.invalidURL(url)
         }
 
-        // Fallback: T directly
-        do {
-            let value = try decoder.decode(T.self, from: data)
-            return BaseResponse(data: value)
-        } catch {
+        let response = await session.upload(
+                multipartFormData: { multipart in
+                    body?
+                        .sorted { $0.key < $1.key }
+                        .forEach { key, value in
+                            multipart.append(Data(String(describing: value).utf8), withName: key)
+                        }
+
+                    multipart.append(
+                        formData.data,
+                        withName: formData.name,
+                        fileName: formData.fileName,
+                        mimeType: formData.mimeType
+                    )
+                },
+                to: finalURL,
+                method: httpMethod,
+                headers: headers.map { HTTPHeaders($0) }
+            )
+            .validate(statusCode: 200..<300)
+            .serializingData()
+            .response
+
+        if let error = response.error {
             throw error
         }
-    }
-}
 
-
-// MARK: - Alamofire Extension
-extension DataRequest {
-    func responseData<T: Codable>(
-        of type: T.Type,
-        observer: AnyObserver<T, any Error>,
-        completionHandler: @escaping (AFDataResponse<Data>) -> Void
-    ) {
-        self.onURLRequestCreation { _ in
-            self.responseData(completionHandler: completionHandler)
+        guard let data = response.data else {
+            throw AFError.responseSerializationFailed(reason: .inputDataNilOrZeroLength)
         }
+
+        return try decodeResponse(data, statusCode: response.response?.statusCode, decoder: decoder)
     }
 }
-

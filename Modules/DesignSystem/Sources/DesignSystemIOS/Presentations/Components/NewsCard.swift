@@ -16,7 +16,7 @@ public struct NewsCard: View {
     public init(article: NewsArticle) {
         self.article = article
     }
-    
+
     public var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             ZStack(alignment: .topLeading) {
@@ -33,29 +33,24 @@ public struct NewsCard: View {
                 )
 
                 HStack(spacing: 4) {
-                    if article.isBreaking {
-                        Circle()
-                            .fill(theme.breakingBadgeFG)
-                            .frame(width: 6, height: 6)
-                    }
-                    Text(article.isBreaking
-                         ? "BREAKING · \(article.category.uppercased())"
-                         : article.category.uppercased())
+                    Circle()
+                        .fill(theme.breakingBadgeFG)
+                        .frame(width: 6, height: 6)
+                    Text("BREAKING · \(article.feed.uppercased())")
                         .appFont(.labelXS, family: .systemMonospaced)
                         .tracking(1.4)
                         .foregroundColor(theme.breakingBadgeFG)
                 }
                 .padding(.horizontal, 10)
                 .padding(.vertical, 6)
-                .background(article.isBreaking ? theme.breakingBadge : Color.black.opacity(0.55))
+                .background(theme.breakingBadge)
                 .clipShape(RoundedRectangle(cornerRadius: 4))
                 .padding(14)
             }
             .clipped()
-            
-            VStack(alignment: .leading, spacing: 10) {
 
-                Text(article.headline)
+            VStack(alignment: .leading, spacing: 10) {
+                Text(article.title)
                     .appFont(.titleMD)
                     .foregroundColor(theme.textPrimary)
                     .lineSpacing(3)
@@ -65,7 +60,7 @@ public struct NewsCard: View {
                     .fill(theme.accent)
                     .frame(width: 28, height: 2)
 
-                Text(article.summary)
+                Text("Trust \(Int((article.trusted * 100).rounded()))% • Mood \(article.happiness > 0 ? "+\(article.happiness)" : "\(article.happiness)")")
                     .appFont(.bodyLG)
                     .foregroundColor(theme.textSecondary)
                     .lineSpacing(4)
@@ -73,11 +68,11 @@ public struct NewsCard: View {
                     .fixedSize(horizontal: false, vertical: true)
 
                 HStack {
-                    Text(article.author)
+                    Text(article.feed)
                         .appFont(.metaXS, weight: .semibold, family: .systemMonospaced)
                         .foregroundColor(theme.textPrimary)
                     Spacer()
-                    Text("\(article.timestamp) · \(article.readTime) min read")
+                    Text(article.pubDate)
                         .appFont(.metaXS, family: .systemMonospaced)
                         .foregroundColor(theme.textMuted)
                 }
@@ -94,18 +89,17 @@ public struct NewsCard: View {
     }
 }
 
-
 #Preview {
     NewsCard(
         article: .init(
-            category: "SPORT",
+            id: 1,
+            title: "Sport title",
+            pubDate: "2026-03-16 12:00:00",
+            url: "https://example.com/news/1",
+            feed: "Sports Feed",
             imageURL: "https://images.unsplash.com/photo-1547347298-4074fc3086f0?auto=format&fit=crop&w=1200&q=80",
-            headline: "Sport title",
-            summary: "This is summary of sport news",
-            author: "Someone",
-            timestamp: "24 Dec 2024",
-            readTime: 100,
-            isBreaking: false
+            happiness: 8,
+            trusted: 0.86
         )
     )
 }

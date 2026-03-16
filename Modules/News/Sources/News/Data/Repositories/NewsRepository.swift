@@ -16,20 +16,34 @@ protocol NewsRepositoryProtocol {
 }
 
 final class NewsRepository: NewsRepositoryProtocol {
+    private let remoteService: any NewsRemoteServiceProtocol
     private let service: any NewsLocalServiceProtocol
 
-    init(service: any NewsLocalServiceProtocol) {
+    init(
+        remoteService: any NewsRemoteServiceProtocol,
+        service: any NewsLocalServiceProtocol
+    ) {
+        self.remoteService = remoteService
         self.service = service
     }
 
     @MainActor
     func fetchArticles() async throws -> [NewsArticle] {
-        try await service.fetchArticles()
+        do {
+            let articles = try await remoteService.fetchArticles()
+            if !articles.isEmpty {
+                return articles
+            }
+        } catch {
+            Logger.warning("Falling back to local news payload: \(error.localizedDescription)")
+        }
+
+        return try await service.fetchArticles()
     }
 
     @MainActor
     func fetchArticle(id: String) async throws -> NewsArticle? {
-        let articles = try await service.fetchArticles()
-        return articles.first { $0.id.uuidString == id.lowercased() }
+        let articles = try await fetchArticles()
+        return articles.first { String($0.id) == id }
     }
 }

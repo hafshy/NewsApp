@@ -52,12 +52,19 @@ public final class NewsAssembly: NewsFeatureProtocol {
     }
 
     private func registerDependencies() {
+        container.register(NewsRemoteServiceProtocol.self) { _ in
+            NewsRemoteService(httpClient: self.makeMockBreakingNewsClient())
+        }
+
         container.register(NewsLocalServiceProtocol.self) { _ in
             NewsLocalService()
         }
 
         container.register(NewsRepositoryProtocol.self) { resolver in
-            NewsRepository(service: self.resolve(NewsLocalServiceProtocol.self, resolver: resolver))
+            NewsRepository(
+                remoteService: self.resolve(NewsRemoteServiceProtocol.self, resolver: resolver),
+                service: self.resolve(NewsLocalServiceProtocol.self, resolver: resolver)
+            )
         }
 
         container.register(FetchArticlesUseCaseProtocol.self) { resolver in
@@ -73,5 +80,37 @@ public final class NewsAssembly: NewsFeatureProtocol {
             fatalError("Failed to resolve \(serviceType)")
         }
         return service
+    }
+
+    private func makeMockBreakingNewsClient() -> any HttpClientProtocol {
+        let request = MockRequest(
+            url: "https://api.oigetit.com/V3/GetBreakingNews",
+            method: .get,
+            headers: [:],
+            queryParams: [
+                "category": "0",
+                "filter": "all",
+                "language": "EN",
+                "region": ""
+            ]
+        )
+
+        return MockHttpClient(
+            responses: [
+                request: MockResponse(data: Self.loadBreakingNewsResponseData())
+            ]
+        )
+    }
+
+    private static func loadBreakingNewsResponseData() -> Data {
+        guard let url = Bundle.module.url(forResource: "response", withExtension: "json") else {
+            fatalError("Missing response.json in News resources")
+        }
+
+        do {
+            return try Data(contentsOf: url)
+        } catch {
+            fatalError("Failed to load response.json: \(error.localizedDescription)")
+        }
     }
 }

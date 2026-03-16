@@ -17,7 +17,7 @@ struct NewsAppTests {
     @MainActor
     @Test func navigatorOpensArticleRoute() {
         let navigator = AppNavigator()
-        let article = NewsArticle.samples[0]
+        let article = makeArticle()
 
         navigator.openArticle(article)
 
@@ -26,7 +26,7 @@ struct NewsAppTests {
 
     @MainActor
     @Test func navigatorUsesDeepLinkParser() {
-        let article = NewsArticle.samples[0]
+        let article = makeArticle()
         let navigator = AppNavigator(
             deepLinkParser: DeepLinkParserStub(route: .news(.detail(article: article)))
         )
@@ -51,6 +51,19 @@ struct NewsAppTests {
         #expect(theme.themeMode == .system)
         #expect(theme.themeMode.colorScheme == nil)
     }
+}
+
+private func makeArticle() -> NewsArticle {
+    NewsArticle(
+        id: 1,
+        title: "Test headline",
+        pubDate: "2026-03-16 12:00:00",
+        url: "https://example.com/article",
+        feed: "Test Feed",
+        imageURL: "https://example.com/image.jpg",
+        happiness: 5,
+        trusted: 0.8
+    )
 }
 
 private struct DeepLinkParserStub: AppDeepLinkParserProtocol {

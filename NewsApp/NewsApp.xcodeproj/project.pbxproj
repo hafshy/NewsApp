@@ -36,33 +36,9 @@
 		5AF054982F5B00070036C987 /* NewsAppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NewsAppUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
-/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		5AF054CB2F5BF6DC0036C987 /* Exceptions for "NewsApp" folder in "NewsApp" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Resources/news_articles.json,
-			);
-			target = 5AF054802F5B00050036C987 /* NewsApp */;
-		};
-/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
-
-/* Begin PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
-		5AF054CC2F5BF6DC0036C987 /* Exceptions for "NewsApp" folder in "Compile Sources" phase from "NewsApp" target */ = {
-			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
-			buildPhase = 5AF0547D2F5B00050036C987 /* Sources */;
-			membershipExceptions = (
-				Resources/news_articles.json,
-			);
-		};
-/* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
-
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		5AF054832F5B00050036C987 /* NewsApp */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				5AF054CB2F5BF6DC0036C987 /* Exceptions for "NewsApp" folder in "NewsApp" target */,
-				5AF054CC2F5BF6DC0036C987 /* Exceptions for "NewsApp" folder in "Compile Sources" phase from "NewsApp" target */,
-			);
 			path = NewsApp;
 			sourceTree = "<group>";
 		};

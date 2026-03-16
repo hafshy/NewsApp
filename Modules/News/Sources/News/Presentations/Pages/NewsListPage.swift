@@ -15,7 +15,7 @@ struct NewsListPage: View {
     @StateObject private var viewModel: NewsListViewModel
     private let themeManager: any ThemeManagerProtocol
     private let onSelectArticle: (NewsArticle) -> Void
-    
+
     init(
         viewModel: NewsListViewModel,
         themeManager: any ThemeManagerProtocol,
@@ -25,11 +25,11 @@ struct NewsListPage: View {
         self.themeManager = themeManager
         self.onSelectArticle = onSelectArticle
     }
-    
+
     var body: some View {
         ZStack {
             theme.pageBackground.ignoresSafeArea()
-            
+
             ScrollView {
                 VStack(spacing: 12) {
                     if viewModel.isLoading {
@@ -41,33 +41,24 @@ struct NewsListPage: View {
                         Text("No Articles")
                     } else {
                         ForEach(viewModel.articles) { news in
-                            Group {
-                                if news.isError {
-                                    NewsCard(article: news)
-                                        .onTapGesture {
-                                            viewModel.showError("Failed to load article")
-                                        }
-                                } else {
-                                    NewsCard(article: news)
-                                        .onTapGesture {
-                                            onSelectArticle(news)
-                                        }
+                            NewsCard(article: news)
+                                .onTapGesture {
+                                    onSelectArticle(news)
                                 }
-                            }
-                            .padding(.horizontal, 12)
+                                .padding(.horizontal, 12)
                         }
                     }
                 }
             }
-            
+
             if let errorMessage = viewModel.errorMessage {
                 VStack {
                     Spacer()
-                    
+
                     ToastView(message: errorMessage)
                         .transition(.move(edge: .top).combined(with: .opacity))
                         .zIndex(1)
-                    
+
                 }
             }
         }

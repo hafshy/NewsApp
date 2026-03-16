@@ -39,8 +39,6 @@ struct ArticleDetailPage: View {
         }
     }
 
-    // MARK: - Header
-
     private var header: some View {
         VStack(alignment: .leading, spacing: 0) {
             AppImage.remote(
@@ -53,38 +51,37 @@ struct ArticleDetailPage: View {
 
             VStack(alignment: .leading, spacing: 12) {
                 HStack(spacing: 6) {
-                    if article.isBreaking {
-                        Text("BREAKING")
-                            .appFont(.labelXS, weight: .bold, family: .systemMonospaced)
-                            .foregroundColor(.white)
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 4)
-                            .background(theme.breakingBadge)
-                            .clipShape(RoundedRectangle(cornerRadius: 4))
-                    }
-                    Text(article.category.uppercased())
+                    Text("BREAKING")
+                        .appFont(.labelXS, weight: .bold, family: .systemMonospaced)
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(theme.breakingBadge)
+                        .clipShape(RoundedRectangle(cornerRadius: 4))
+
+                    Text(article.feed.uppercased())
                         .appFont(.labelXS, weight: .bold, family: .systemMonospaced)
                         .tracking(1.4)
                         .foregroundColor(theme.accent)
                 }
 
-                Text(article.headline)
+                Text(article.title)
                     .appFont(.detailTitle)
                     .foregroundColor(theme.textPrimary)
                     .lineSpacing(4)
 
                 HStack(spacing: 6) {
-                    Text(article.author)
+                    Text(article.feed)
                         .appFont(.bodySM, weight: .semibold, family: .systemMonospaced)
                         .foregroundColor(theme.textSecondary)
                     Text("·")
                         .foregroundColor(theme.textMuted)
-                    Text(article.timestamp)
+                    Text(article.pubDate)
                         .appFont(.bodySM, family: .systemMonospaced)
                         .foregroundColor(theme.textMuted)
                     Text("·")
                         .foregroundColor(theme.textMuted)
-                    Text("\(article.readTime) min read")
+                    Text("Trust \(Int((article.trusted * 100).rounded()))%")
                         .appFont(.bodySM, family: .systemMonospaced)
                         .foregroundColor(theme.textMuted)
                 }
@@ -95,15 +92,12 @@ struct ArticleDetailPage: View {
         .background(theme.cardSurface)
     }
 
-    // MARK: - Content
-
     private var content: some View {
         VStack(alignment: .leading, spacing: 16) {
             Divider()
                 .background(theme.divider)
 
-            // Summary as lead paragraph
-            Text(article.summary)
+            Text("Source: \(article.feed)")
                 .appFont(.detailLead)
                 .foregroundColor(theme.textPrimary)
                 .lineSpacing(6)
@@ -111,15 +105,19 @@ struct ArticleDetailPage: View {
             Divider()
                 .background(theme.divider)
 
-            // Placeholder body — replace with real content from your data layer
-            Text("The story continues with additional reporting and analysis from our correspondents around the world. Full coverage including expert commentary and background context is available below.")
+            Text("Published: \(article.pubDate)")
                 .appFont(.bodyMD)
                 .foregroundColor(theme.textSecondary)
                 .lineSpacing(7)
 
-            Text("Developing details suggest a broader pattern that analysts have been tracking for several months. Sources close to the situation confirmed key elements of the report, though official statements remain pending.")
+            Text("Mood: \(article.happiness > 0 ? "+\(article.happiness)" : "\(article.happiness)")")
                 .appFont(.bodyMD)
                 .foregroundColor(theme.textSecondary)
+                .lineSpacing(7)
+
+            Text(article.url)
+                .appFont(.bodyMD)
+                .foregroundColor(theme.accent)
                 .lineSpacing(7)
         }
         .padding(20)
