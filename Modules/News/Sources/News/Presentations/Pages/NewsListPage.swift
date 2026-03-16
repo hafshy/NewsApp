@@ -17,10 +17,18 @@ struct NewsListPage: View {
         let iconName: String
     }
 
+    private struct SidebarMenuItem: Identifiable {
+        let id: String
+        let title: String
+        let iconName: String
+        let showsChevron: Bool
+    }
+
     private enum Layout {
         static let headerBlue = Color(hex: "#32B7EF")
         static let pageSpacing: CGFloat = 14
         static let horizontalPadding: CGFloat = 12
+        static let sidebarWidth: CGFloat = 310
     }
 
     private let categories: [CategoryItem] = [
@@ -40,9 +48,21 @@ struct NewsListPage: View {
         .init(id: "sustainability", title: "Sustainability", iconName: "ic_sustainability")
     ]
 
+    private let sidebarItems: [SidebarMenuItem] = [
+        .init(id: "saved", title: "Saved Stories", iconName: "star.fill", showsChevron: false),
+        .init(id: "rate-news", title: "How We Rate News", iconName: "shield.fill", showsChevron: false),
+        .init(id: "faq", title: "FAQ", iconName: "questionmark.bubble.fill", showsChevron: false),
+        .init(id: "rate-app", title: "Rate This App", iconName: "rectangle.and.pencil.and.ellipsis", showsChevron: false),
+        .init(id: "settings", title: "Settings", iconName: "gearshape.fill", showsChevron: false),
+        .init(id: "contact", title: "Contact Us", iconName: "questionmark.circle.fill", showsChevron: false),
+        .init(id: "language", title: "Choose Language", iconName: "globe", showsChevron: true),
+        .init(id: "location", title: "Choose Location", iconName: "location.viewfinder", showsChevron: true)
+    ]
+
     @EnvironmentObject var theme: NewsTheme
     @StateObject private var viewModel: NewsListViewModel
     @State private var selectedCategoryID = "breaking"
+    @State private var isSidebarPresented = false
     private let themeManager: any ThemeManagerProtocol
     private let onSelectArticle: (NewsArticle) -> Void
 
@@ -103,8 +123,13 @@ struct NewsListPage: View {
 
                 }
             }
+
+            if isSidebarPresented {
+                sidebarOverlay
+            }
         }
         .animation(.spring(response: 0.4, dampingFraction: 0.8), value: viewModel.errorMessage)
+        .animation(.spring(response: 0.32, dampingFraction: 0.86), value: isSidebarPresented)
         .toolbar(.hidden, for: .navigationBar)
         .onAppear {
             Task {
@@ -127,18 +152,23 @@ struct NewsListPage: View {
         ZStack(alignment: .center) {
             HStack {
                 HStack(spacing: 20) {
-                    AppImage.system("line.3.horizontal", tint: .white)
-                        .frame(width: 20, height: 20)
+                    Button {
+                        isSidebarPresented = true
+                    } label: {
+                        AppImage.system("line.3.horizontal", tint: .white)
+                            .frame(width: 20, height: 20)
+                    }
+                    .buttonStyle(.plain)
                     
                     Button {
                     } label: {
-                        RoundedRectangle(cornerRadius: 2, style: .continuous)
-                            .stroke(Color.red.opacity(0.8), lineWidth: 1.25)
+                        RoundedRectangle(cornerRadius: 4, style: .continuous)
+                            .stroke(theme.errorForeground, lineWidth: 1.25)
                             .frame(width: 24, height: 24)
                             .overlay {
                                 Text("P")
                                     .appFont(.metaXS, weight: .medium, family: .montserrat)
-                                    .foregroundStyle(Color.red.opacity(0.9))
+                                    .foregroundStyle(theme.errorForeground)
                             }
                     }
                 }
@@ -245,6 +275,104 @@ struct NewsListPage: View {
                 }
             }
             .padding(.horizontal, Layout.horizontalPadding)
+        }
+    }
+
+    private var sidebarOverlay: some View {
+        GeometryReader { geometry in
+            ZStack(alignment: .leading) {
+                Color.black.opacity(0.18)
+                    .ignoresSafeArea()
+                    .onTapGesture {
+                        isSidebarPresented = false
+                    }
+
+                sidebarPanel(height: geometry.size.height)
+                    .transition(.move(edge: .leading))
+            }
+        }
+        .zIndex(2)
+    }
+
+    private func sidebarPanel(height: CGFloat) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            ScrollView(showsIndicators: false) {
+                VStack(alignment: .leading, spacing: 0) {
+                    VStack(spacing: 0) {
+                        ForEach(sidebarItems) { item in
+                            sidebarRow(item)
+                        }
+                    }
+
+                    VStack(alignment: .leading, spacing: 18) {
+                        Text("Version: 1.1.19(1)")
+                            .appFont(.bodySM, family: .montserrat)
+                            .foregroundStyle(Color.gray.opacity(0.7))
+
+                        Text("Delete Account")
+                            .appFont(.bodyMD, family: .montserrat)
+                            .foregroundStyle(theme.textPrimary)
+                    }
+                    .padding(.horizontal, 22)
+                    .padding(.vertical, 24)
+
+                    Divider()
+
+                    VStack(alignment: .leading, spacing: 18) {
+                        Text("CATEGORIES")
+                            .appFont(.bodySM, weight: .medium, family: .montserrat)
+                            .foregroundStyle(Color.gray.opacity(0.7))
+
+                        ForEach(categories) { category in
+                            Button {
+                                selectedCategoryID = category.id
+                                isSidebarPresented = false
+                            } label: {
+                                Text(category.title)
+                                    .appFont(.bodyMD, weight: category.id == selectedCategoryID ? .semibold : .regular, family: .montserrat)
+                                    .foregroundStyle(theme.textPrimary)
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                    .padding(.horizontal, 22)
+                    .padding(.vertical, 24)
+                }
+                .padding(.bottom, 24)
+            }
+        }
+        .frame(width: Layout.sidebarWidth, height: height, alignment: .topLeading)
+        .background(Color.white)
+        .shadow(color: .black.opacity(0.18), radius: 24, x: 6, y: 0)
+    }
+
+    private func sidebarRow(_ item: SidebarMenuItem) -> some View {
+        VStack(spacing: 0) {
+            Button {
+            } label: {
+                HStack(spacing: 16) {
+                    AppImage.system(item.iconName, tint: theme.textPrimary)
+                        .frame(width: 20, height: 20)
+
+                    Text(item.title)
+                        .appFont(.bodyMD, family: .montserrat)
+                        .foregroundStyle(theme.textPrimary)
+
+                    Spacer()
+
+                    if item.showsChevron {
+                        AppImage.system("chevron.down", tint: theme.textPrimary)
+                            .frame(width: 12, height: 12)
+                    }
+                }
+                .padding(.horizontal, 22)
+                .frame(height: 52)
+            }
+            .buttonStyle(.plain)
+
+            if item.id == "contact" || item.id == "location" {
+                Divider()
+            }
         }
     }
 }
