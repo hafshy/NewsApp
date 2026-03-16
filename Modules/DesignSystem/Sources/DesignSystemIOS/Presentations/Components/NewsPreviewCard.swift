@@ -19,73 +19,105 @@ public struct NewsPreviewCard: View {
 
     public var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            ZStack(alignment: .topLeading) {
+            HStack(spacing: 20) {
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack {
+                        AppImage.asset(
+                            "ic_verified",
+                            contentMode: .fit,
+                            tint: Color(token: theme.core.colors.semantic.successFG)
+                        )
+                        .frame(height: 37)
+                        
+                        AnimatedOutlinedPercentageText(
+                            value: 88,
+                            style: .titleMD,
+                            fillColor: .white,
+                            strokeColor: Color(
+                                token: article.trusted < 0.65 ?
+                                theme.core.colors.semantic.warningFG : article.trusted < 0.35 ?
+                                theme.core.colors.semantic.errorFG :
+                                    theme.core.colors.semantic.successFG
+                            ),
+                            stepDuration: 0.015
+                        )
+                        .offset(x: -20)
+                    }
+                    
+                    Text(article.title)
+                        .appFont(.detailLead, family: .montserrat)
+                        .foregroundColor(theme.textPrimary)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .lineLimit(3)
+                    
+                    Spacer()
+                    
+                    Text(article.feed)
+                        .appFont(.labelXS, weight: .regular, family: .montserrat)
+                        .foregroundColor(theme.textSecondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .lineLimit(1)
+                }
+                
+                Spacer()
+                
                 AppImage.remote(
                     URL(string: article.imageURL ?? ""),
                     placeholderSystemName: "newspaper"
                 )
-                .frame(height: 180)
-                .overlay(
-                    LinearGradient(
-                        colors: [.clear, .black.opacity(0.32)],
-                        startPoint: .top, endPoint: .bottom
-                    )
-                )
-
-                HStack(spacing: 4) {
-                    Circle()
-                        .fill(theme.breakingBadgeFG)
-                        .frame(width: 6, height: 6)
-                    Text("BREAKING · \(article.feed.uppercased())")
-                        .appFont(.labelXS, family: .systemMonospaced)
-                        .tracking(1.4)
-                        .foregroundColor(theme.breakingBadgeFG)
-                }
-                .padding(.horizontal, 10)
-                .padding(.vertical, 6)
-                .background(theme.breakingBadge)
-                .clipShape(RoundedRectangle(cornerRadius: 4))
-                .padding(14)
+                .frame(width: 150, height: 130)
+                .cornerRadius(8)
+                .clipped()
             }
-            .clipped()
-
-            VStack(alignment: .leading, spacing: 10) {
-                Text(article.title)
-                    .appFont(.titleMD)
-                    .foregroundColor(theme.textPrimary)
-                    .lineSpacing(3)
-                    .fixedSize(horizontal: false, vertical: true)
-
-                Rectangle()
-                    .fill(theme.accent)
-                    .frame(width: 28, height: 2)
-
-                Text("Trust \(Int((article.trusted * 100).rounded()))% • Mood \(article.happiness > 0 ? "+\(article.happiness)" : "\(article.happiness)")")
-                    .appFont(.bodyLG)
-                    .foregroundColor(theme.textSecondary)
-                    .lineSpacing(4)
-                    .lineLimit(3)
-                    .fixedSize(horizontal: false, vertical: true)
-
-                HStack {
-                    Text(article.feed)
-                        .appFont(.metaXS, weight: .semibold, family: .systemMonospaced)
+            .frame(height: 130)
+            .padding(8)
+            
+            Divider()
+            
+            HStack {
+                HStack(alignment: .center, spacing: 6) {
+                    AppImage.asset(
+                        article.happiness < 0 ? "ic_sent_negative" : article.happiness == 0 ? "ic_sent_neutral" : "ic_sent_positive",
+                        tint: Color(
+                            token: article.happiness < 0 ? theme.core.colors.semantic.errorFG : article.happiness == 0 ? theme.core.colors.semantic.warningFG : theme.core.colors.semantic.successFG
+                        )
+                    ).frame(width: 18, height: 18)
+                    
+                    Text("Sentiment")
+                        .appFont(.metaXS, weight: .semibold, family: .montserrat)
                         .foregroundColor(theme.textPrimary)
-                    Spacer()
-                    Text(article.pubDate)
-                        .appFont(.metaXS, family: .systemMonospaced)
-                        .foregroundColor(theme.textMuted)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .lineLimit(1)
+                    
+                    AppImage.asset(
+                        "ic_sent_negative"
+                    ).frame(width: 12, height: 12)
+                }
+                
+                Spacer()
+                
+                HStack(spacing: 12) {
+                    AppImage.asset(
+                        "ic_like",
+                        contentMode: .fit
+                    ).frame(width: 18, height: 18)
+                    
+                    AppImage.asset(
+                        "ic_comment",
+                        contentMode: .fit
+                    ).frame(width: 18, height: 18)
+                    
+                    AppImage.asset(
+                        "ic_more",
+                        contentMode: .fit
+                    )
+                    .frame(height: 18)
                 }
             }
-            .padding(16)
-            .background(theme.cardSurface)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 6)
         }
-        .clipShape(RoundedRectangle(cornerRadius: 10))
-        .shadow(color: theme.cardShadow, radius: 12, x: 0, y: 4)
-        .shadow(color: theme.cardShadow.opacity(0.5), radius: 2, x: 0, y: 1)
-        .scaleEffect(isPressed ? 0.98 : 1.0)
-        .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isPressed)
-        .onLongPressGesture(minimumDuration: .infinity, pressing: { isPressed = $0 }, perform: {})
+        .background(Color(token: theme.core.colors.grey.grey100))
     }
 }
 
@@ -98,8 +130,10 @@ public struct NewsPreviewCard: View {
             url: "https://example.com/news/1",
             feed: "Sports Feed",
             imageURL: "https://images.unsplash.com/photo-1547347298-4074fc3086f0?auto=format&fit=crop&w=1200&q=80",
-            happiness: 8,
-            trusted: 0.86
+            happiness: 19,
+            trusted: 0.8
         )
     )
+    .padding()
+    .environmentObject(NewsTheme())
 }

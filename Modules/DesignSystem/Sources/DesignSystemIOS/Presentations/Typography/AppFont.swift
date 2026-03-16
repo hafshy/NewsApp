@@ -35,7 +35,7 @@ public enum AppFontStyle: CaseIterable, Sendable {
         case .metaXS:
             11
         case .titleMD:
-            18
+            20
         case .bodyLG:
             18
         case .bodyMD:
